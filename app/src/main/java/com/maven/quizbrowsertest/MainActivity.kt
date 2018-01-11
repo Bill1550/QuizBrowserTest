@@ -29,10 +29,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false)
+
         setContentView(R.layout.activity_main)
         setupUrlSpinner()
         setupWebView()
         setupProgressBar()
+
     }
 
     private fun setupUrlSpinner(){
@@ -69,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadUrl(url: String){
         // validate?
         closeKeyboard()
+        jsInterface.setKey(readApiKeyFromPrefs())    // referesh key
         webView.loadUrl(url, hashMapOf("api-key" to readApiKeyFromPrefs()))
         webView.requestFocus()
         progressBar.progress = 0
@@ -81,14 +85,16 @@ class MainActivity : AppCompatActivity() {
         webView.webChromeClient = webChromeClient
         webView.settings.javaScriptEnabled = true
         webView.addJavascriptInterface(jsInterface, "APP_DATA")
-        jsInterface.setKey(readApiKeyFromPrefs())
-        webView.loadUrl("file:///android_asset/read_api_key.html")
 
+        webView.run { // push to back of queue
+            loadUrl("file:///android_asset/read_api_key.html") // temp
+        }
     }
+
+
 
     private fun setupProgressBar(){
         progressBar.max = 100
-        progressBar.min = 0
 
     }
 
