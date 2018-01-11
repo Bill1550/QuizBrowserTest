@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         progressBar.progress = 0
     }
 
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         WebView.setWebContentsDebuggingEnabled(true)
