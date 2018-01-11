@@ -1,6 +1,7 @@
 package com.maven.quizbrowsertest
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.support.v7.app.AppCompatActivity
@@ -10,25 +11,75 @@ import android.preference.PreferenceManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ArrayAdapter
+import android.widget.ListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     private val jsInterface: JSInterface = JSInterface()
+    private lateinit var urlAdapter: ListAdapter
 
-    @SuppressLint("SetJavaScriptEnabled")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setupUrlSpinner()
+        setupWebView()
+    }
+
+    private fun setupUrlSpinner(){
+        urlAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, resources.getStringArray(R.array.standard_urls))
+        editSpinner.setAdapter(urlAdapter)
+
+        editSpinner.setOnItemClickListener { parent, view, position, id ->
+            loadUrl(urlAdapter.getItem(position) as String)
+        }
+
+        editSpinner.setOnEditorActionListener { v, actionId, event ->
+            Log.i("editListener", "action=" + actionId)
+            when (actionId) {
+                EditorInfo.IME_ACTION_DONE,
+                EditorInfo.IME_ACTION_SEND,
+                EditorInfo.IME_ACTION_GO,
+                EditorInfo.IME_ACTION_SEARCH -> {
+                    Log.i("edit done", "url=" + editSpinner.text.toString())
+                    loadUrl(editSpinner.text.toString())
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        }
+
+        editSpinner.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus)
+                loadUrl(editSpinner.text.toString())
+        }
+    }
+
+    private fun loadUrl(url: String){
+        // validate?
+        closeKeyboard()
+        webView.loadUrl(url, hashMapOf("api-key" to readApiKeyFromPrefs()))
+        webView.requestFocus()
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun setupWebView() {
         WebView.setWebContentsDebuggingEnabled(true)
         webView.webViewClient = webViewClient
         webView.settings.javaScriptEnabled = true
-        webView.addJavascriptInterface(jsInterface,"APP_DATA")
+        webView.addJavascriptInterface(jsInterface, "APP_DATA")
         jsInterface.setKey(readApiKeyFromPrefs())
         webView.loadUrl("file:///android_asset/read_api_key.html")
+
     }
 
 
@@ -103,5 +154,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun readApiKeyFromPrefs(): String{
         return PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_key_api_key), "missing-key")
+    }
+
+    private fun closeKeyboard(){
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                .hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 }
