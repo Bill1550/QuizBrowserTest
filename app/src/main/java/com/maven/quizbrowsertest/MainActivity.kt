@@ -83,7 +83,6 @@ class MainActivity : AppCompatActivity() {
         webView.addJavascriptInterface(jsInterface, "APP_DATA")
         jsInterface.setKey(readApiKeyFromPrefs())
         webView.loadUrl("file:///android_asset/read_api_key.html")
-
     }
 
     private fun setupProgressBar(){
