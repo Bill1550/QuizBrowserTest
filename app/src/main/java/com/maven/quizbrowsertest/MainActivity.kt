@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ArrayAdapter
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setupUrlSpinner()
         setupWebView()
+        setupProgressBar()
     }
 
     private fun setupUrlSpinner(){
@@ -69,16 +71,24 @@ class MainActivity : AppCompatActivity() {
         closeKeyboard()
         webView.loadUrl(url, hashMapOf("api-key" to readApiKeyFromPrefs()))
         webView.requestFocus()
+        progressBar.progress = 0
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         WebView.setWebContentsDebuggingEnabled(true)
         webView.webViewClient = webViewClient
+        webView.webChromeClient = webChromeClient
         webView.settings.javaScriptEnabled = true
         webView.addJavascriptInterface(jsInterface, "APP_DATA")
         jsInterface.setKey(readApiKeyFromPrefs())
         webView.loadUrl("file:///android_asset/read_api_key.html")
+
+    }
+
+    private fun setupProgressBar(){
+        progressBar.max = 100
+        progressBar.min = 0
 
     }
 
@@ -149,6 +159,12 @@ class MainActivity : AppCompatActivity() {
                 evaluateJavascript("window.mvnapikey='" + readApiKeyFromPrefs() + "'", null)
             }
             super.onPageStarted(view, url, favicon)
+        }
+    }
+
+    private val webChromeClient = object: WebChromeClient(){
+        override fun onProgressChanged(view: WebView?, newProgress: Int) {
+            progressBar.progress = newProgress
         }
     }
 
