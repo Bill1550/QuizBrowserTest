@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>Read api-key from injected object</title>
+    <script language="JavaScript">
+        function updateKey(key){
+            document.getElementById("api-key").innerHTML=key;
+        }
+
+        function pullKey(){
+            // read as json object. safer way to move values incase we want to move other things that aren't strings.
+            var result=JSON.parse(APP_DATA.getKeyJson());
+            //updateKey(result.api_key);
+
+            // or just read the string
+            updateKey(APP_DATA.getKey())
+        }
+
+        function readDomKey(){
+            console.log("domKey=" + window.mvnapikey)
+            document.getElementById("mvn-api-key").innerHTML = window.mvnapikey
+        }
+
+        window.onload = function(){
+            console.log("---- hi! from onLoad")
+            readDomKey()
+        }
+
+        function setKey(key){
+            document.getElementById("set-key-result").innerHTML = key
+        }
+    </script>
+</head>
+<body>
+<p><b><a onClick="pullKey()" >Click to Read key:</a>   </b><span id="api-key">---</span></p>
+<p><b><a onClick="readDomKey()">Key from dom model:</a></b> <span id="mvn-api-key">---</span></p>
+<p><b>Key set by call to setKey on load complete:</b> <span id="set-key-result">---</span></p>
+</body>
+</html>
