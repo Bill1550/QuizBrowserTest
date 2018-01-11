@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         setupUrlSpinner()
         setupWebView()
         setupProgressBar()
-
     }
 
     private fun setupUrlSpinner(){
@@ -90,8 +89,6 @@ class MainActivity : AppCompatActivity() {
             loadUrl("file:///android_asset/read_api_key.html") // temp
         }
     }
-
-
 
     private fun setupProgressBar(){
         progressBar.max = 100
