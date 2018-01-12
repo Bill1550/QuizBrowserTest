@@ -10,6 +10,7 @@
 
     <!-- Defined URLs -->
     <string-array name="standard_urls">
+        <item>https://www.google.com</item>
         <item>file:///android_asset/read_api_key.html</item>
         <item>https://www.mavenclinic.com</item>
         <item>https://mavenclinic.com/forum</item>
