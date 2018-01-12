@@ -155,8 +155,7 @@ class MainActivity : AppCompatActivity() {
             Log.i("onPageFinished","page load complete")
             view?.apply{
                 evaluateJavascript("window.mvnapikey='" + readApiKeyFromPrefs() + "'", null)
-
-//                evaluateJavascript("setKey('" + readApiKeyFromPrefs() + "')", null)
+                evaluateJavascript("setKey('" + readApiKeyFromPrefs() + "')", null)
             }
             super.onPageFinished(view, url)
         }
