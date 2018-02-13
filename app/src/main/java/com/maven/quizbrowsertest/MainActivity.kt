@@ -36,12 +36,8 @@ class MainActivity : AppCompatActivity() {
         setupUrlSpinner()
         setupWebView()
         setupProgressBar()
-    }
 
-    override fun onResume() {
-        super.onResume()
-
-        loadUrl("file:///android_asset/read_api_key.html") // temp
+        loadUrl("file:///android_asset/read_api_key.html")
     }
 
     private fun setupUrlSpinner(){
@@ -71,7 +67,10 @@ class MainActivity : AppCompatActivity() {
 
         editSpinner.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus)
-                loadUrl(editSpinner.text.toString())
+                editSpinner.text.toString().let {
+                if (it.isNotBlank())
+                    loadUrl(it)
+            }
         }
     }
 
@@ -80,9 +79,11 @@ class MainActivity : AppCompatActivity() {
         closeKeyboard()
         jsInterface.setKey(readApiKeyFromPrefs())    // refresh key
         jsInterface.setMessageHandler { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
+        jsInterface.setKey(readApiKeyFromPrefs())    // refresh key
+        editSpinner.setText("")     // make sure that switching focus doesn't cause a double load.
+        webView.requestFocus()      // make sure that caret is out of edit box
+        editSpinner.setText(url)    // make sure that current URL is displayed (in case it came from someplace other than the drop down)
         webView.loadUrl(url, hashMapOf("api-key" to readApiKeyFromPrefs()))
-        webView.requestFocus()
-        editSpinner.setText(url)
         progressBar.progress = 0
     }
 
@@ -97,6 +98,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupProgressBar(){
         progressBar.max = 100
+        progressBar.progress=0
     }
 
     class JSInterface {
@@ -161,7 +163,6 @@ class MainActivity : AppCompatActivity() {
             Log.i("onPageFinished","page load complete")
             view?.apply{
                 evaluateJavascript("window.mvnapikey='" + readApiKeyFromPrefs() + "'", null)
-
                 evaluateJavascript("setKey('" + readApiKeyFromPrefs() + "')", null)
             }
             super.onPageFinished(view, url)
