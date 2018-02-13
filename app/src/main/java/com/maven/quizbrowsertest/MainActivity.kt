@@ -19,6 +19,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ArrayAdapter
 import android.widget.ListAdapter
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +36,12 @@ class MainActivity : AppCompatActivity() {
         setupUrlSpinner()
         setupWebView()
         setupProgressBar()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        loadUrl("file:///android_asset/read_api_key.html") // temp
     }
 
     private fun setupUrlSpinner(){
@@ -71,12 +78,13 @@ class MainActivity : AppCompatActivity() {
     private fun loadUrl(url: String){
         // validate?
         closeKeyboard()
-        jsInterface.setKey(readApiKeyFromPrefs())    // referesh key
+        jsInterface.setKey(readApiKeyFromPrefs())    // refresh key
+        jsInterface.setMessageHandler { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
         webView.loadUrl(url, hashMapOf("api-key" to readApiKeyFromPrefs()))
         webView.requestFocus()
+        editSpinner.setText(url)
         progressBar.progress = 0
     }
-
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
@@ -84,29 +92,30 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
         webView.settings.javaScriptEnabled = true
-        webView.addJavascriptInterface(jsInterface, "APP_DATA")
-
-        webView.run { // push to back of queue
-            loadUrl("file:///android_asset/read_api_key.html") // temp
-        }
+        webView.addJavascriptInterface(jsInterface, "APP_INTERFACE")
     }
 
     private fun setupProgressBar(){
         progressBar.max = 100
-
     }
-
 
     class JSInterface {
         private var _key: String=""
+        private var _messageHandler: ((String)->Unit)? = null
 
         fun setKey(key: String) { _key=key}
+        fun setMessageHandler( handler: (String)->Unit) { _messageHandler=handler}
 
         @JavascriptInterface
         fun getKeyJson(): String = "{\"api_key\": \"_key\"}"
 
         @JavascriptInterface
         fun getKey(): String = _key
+
+        @JavascriptInterface
+        fun sendMessage(msg: String) {
+            _messageHandler?.invoke(msg)
+        }
     }
 
     override fun onBackPressed() {

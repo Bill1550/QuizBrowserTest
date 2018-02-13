@@ -7,12 +7,12 @@
         }
 
         function pullKey(){
-            // read as json object. safer way to move values incase we want to move other things that aren't strings.
-            var result=JSON.parse(APP_DATA.getKeyJson());
+            // read as json object. safer way to move values in case we want to move other things that aren't strings.
+            var result=JSON.parse(APP_INTERFACE.getKeyJson());
             //updateKey(result.api_key);
 
             // or just read the string
-            updateKey(APP_DATA.getKey())
+            updateKey(APP_INTERFACE.getKey())
         }
 
         function readDomKey(){
@@ -28,11 +28,16 @@
         function setKey(key){
             document.getElementById("set-key-result").innerHTML = key
         }
+
+        function pingAndroid(){
+            APP_INTERFACE.sendMessage("ping!")
+        }
     </script>
 </head>
 <body>
 <p><b><a onClick="pullKey()" >Click to Read key:</a>   </b><span id="api-key">---</span></p>
 <p><b><a onClick="readDomKey()">Key from dom model:</a></b> <span id="mvn-api-key">---</span></p>
 <p><b>Key set by call to setKey on load complete:</b> <span id="set-key-result">---</span></p>
+<p><b><a onClick="pingAndroid()">Click to ping Android.</a></b></p>
 </body>
 </html>
