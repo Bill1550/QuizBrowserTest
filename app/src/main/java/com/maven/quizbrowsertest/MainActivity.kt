@@ -22,6 +22,7 @@ import android.widget.ListAdapter
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
 
     private val jsInterface: JSInterface = JSInterface()
