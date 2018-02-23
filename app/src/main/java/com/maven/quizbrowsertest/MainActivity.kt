@@ -102,6 +102,8 @@ class MainActivity : AppCompatActivity() {
         progressBar.progress=0
     }
 
+
+
     class JSInterface {
         private var _key: String=""
         private var _messageHandler: ((String)->Unit)? = null
